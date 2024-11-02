@@ -1,0 +1,9 @@
+#cargo-features = ["nonzero_internals"]
+
+[package]
+name = "rhilbert"
+version = "0.1.0"
+edition = "2021"
+authors = ["Chuck Ocheret"]
+
+[dependencies]
