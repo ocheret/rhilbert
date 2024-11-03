@@ -67,7 +67,7 @@ pub fn max_value(n: u8, m: u8) -> u32 {
 /// This will be:
 /// (2 ** m) - 1
 pub fn max_coord(m: u8) -> u32 {
-    return (1u32 << m) - 1;
+    (1u32 << m) - 1
 }
 
 /// TODO: Fix this documentation to be more rustacean.
@@ -208,12 +208,10 @@ pub fn hilbert_value_to_point(n: u8, m: u8, h: u32) -> Vec<u32> {
     }
 
     // Calculate the result
-    for k in 0..n as usize {
-        a[k] = 0;
-        let shift = n - k as u8 - 1;
-        for i in 0..m as usize {
-            a[k] |= ((alpha[i] >> shift) & 1) << (m - i as u8 - 1);
-        }
+    for (k, a_k) in a.iter_mut().enumerate() {
+        *a_k = (0..m as usize).fold(0, |acc, i| {
+            acc | (((alpha[i] >> (n - k as u8 - 1)) & 1) << (m - i as u8 - 1))
+        });
     }
 
     // #    print "h", h
@@ -249,12 +247,10 @@ pub fn point_to_hilbert_value(m: u8, a: Vec<u32>) -> u32 {
     let mut alpha = vec![0u32; m as usize];
 
     // Compute the alpha values from a[]
-    for i in 0..m as usize {
-        alpha[i] = 0;
-        let shift = m - i as u8 - 1;
-        for k in 0..n as usize {
-            alpha[i] |= ((a[k] >> shift) & 1) << (n - k as u8 - 1);
-        }
+    for (i, alpha_i) in alpha.iter_mut().enumerate() {
+        *alpha_i = (0..n as usize).fold(0, |acc, k| {
+            acc | (((a[k] >> (m - i as u8 - 1)) & 1) << (n - k as u8 - 1))
+        });
     }
 
     // Calculate values for i == 0 in preperation for loop
@@ -266,7 +262,7 @@ pub fn point_to_hilbert_value(m: u8, a: Vec<u32>) -> u32 {
     // sigma[0] = rho[0] ^ (rho[0] >>> 1)
     let mut bit = 1u32 << (n - 1);
     rho[0] = sigma[0] & bit;
-    for k in (0..n - 1).rev() {
+    for _ in 0..n - 1 {
         bit >>= 1;
         rho[0] |= (sigma[0] ^ (rho[0] >> 1)) & bit;
     }
@@ -361,23 +357,40 @@ mod tests {
                 let max_value = max_value(n, m);
                 let max_coord = max_coord(m);
 
-                println!("dimensionality n = {}, order m = {}, max_coord = {}, max_value = {}", n, m, max_coord, max_value);
+                println!(
+                    "dimensionality n = {}, order m = {}, max_coord = {}, max_value = {}",
+                    n, m, max_coord, max_value
+                );
 
-			// Allocate storage for all coordinates in hilbert value order and as a set
+                // Allocate storage for all coordinates in hilbert value order and as a set
                 let mut coords = vec![Vec::new(); (max_value + 1) as usize];
                 let mut set = std::collections::HashSet::new();
 
                 for h in 0..=max_value {
                     coords[h as usize] = hilbert_value_to_point(n, m, h);
                     for &c in &coords[h as usize] {
-                        assert!(c <= max_coord, "Coordinates {:?} > {}", coords[h as usize], max_coord);
+                        assert!(
+                            c <= max_coord,
+                            "Coordinates {:?} > {}",
+                            coords[h as usize],
+                            max_coord
+                        );
                     }
                     set.insert(coords[h as usize].clone());
                     let h_test = point_to_hilbert_value(m, coords[h as usize].clone());
-                    assert_eq!(h, h_test, "Hilbert value mismatch {} -> {:?} -> {}", h, coords[h as usize], h_test);
+                    assert_eq!(
+                        h, h_test,
+                        "Hilbert value mismatch {} -> {:?} -> {}",
+                        h, coords[h as usize], h_test
+                    );
                 }
 
-                assert_eq!(coords.len(), set.len(), "Not all {} coordinates are unique", max_value + 1);
+                assert_eq!(
+                    coords.len(),
+                    set.len(),
+                    "Not all {} coordinates are unique",
+                    max_value + 1
+                );
 
                 for i in 1..coords.len() {
                     let mut change_count = 0;
@@ -386,14 +399,21 @@ mod tests {
                     for j in 0..n as usize {
                         if a[j] != b[j] {
                             change_count += 1;
-                            let diff = if a[j] > b[j] { a[j] - b[j] } else { b[j] - a[j] };
+                            let diff = if a[j] > b[j] {
+                                a[j] - b[j]
+                            } else {
+                                b[j] - a[j]
+                            };
                             assert_eq!(diff, 1, "{:?} and {:?} differ by {}", b, a, diff);
                         }
                     }
-                    assert_eq!(change_count, 1, "Too many coordinates change between {:?} and {:?}", a, b);
+                    assert_eq!(
+                        change_count, 1,
+                        "Too many coordinates change between {:?} and {:?}",
+                        a, b
+                    );
                 }
             }
         }
     }
 }
-
