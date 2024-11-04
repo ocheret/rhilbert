@@ -337,8 +337,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use num_bigint::BigUint;
-
     use super::*;
 
     #[test]
