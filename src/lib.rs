@@ -59,7 +59,7 @@
 
 use num_integer::Integer;
 use num_traits::{FromPrimitive, One, ToPrimitive, Zero};
-use std::ops::{Add, BitAnd, BitOr, BitXor, Shl, Shr, Sub};
+use std::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 
 /// TODO - HilbertCurve is a struct that contains the state of the Hilbert Curve
 pub struct HilbertCurve<T>
