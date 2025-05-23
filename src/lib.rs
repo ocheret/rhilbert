@@ -63,8 +63,6 @@ use std::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 
 /// TODO - HilbertCurve is a struct that contains the state of the Hilbert Curve
 pub struct HilbertCurve<T>
-where
-    T: Integer + Clone + Zero + One + FromPrimitive + ToPrimitive,
 {
     n: u8,
     m: u8,
@@ -83,7 +81,7 @@ where
 // where
 //     T: Integer + Clone + Zero + One + FromPrimitive + ToPrimitive,
 //     for<'a> &'a T: BitAnd<Output = T>
-//         + BitOr<Output = T>
+//         + BitOr<Output = T> 
 //         + BitXor<Output = T>
 //         + Shl<u32, Output = T>
 //         + Shr<u32, Output = T>,
